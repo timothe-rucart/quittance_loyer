@@ -1,10 +1,24 @@
 package org.example.service;
 
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Jpeg;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
 
 @Service
 public class PDFGenerator {
@@ -20,15 +34,10 @@ public class PDFGenerator {
         while ((strLine = br.readLine()) != null) {
             addParagrapheToPdf(strLine, myFont, pdfDoc);
         }
+        addSignature(pdfDoc);
 
         pdfDoc.close();
         br.close();
-    }
-
-    private void addParagrapheToPdf(String strLine, Font myFont, Document pdfDoc) throws DocumentException {
-        Paragraph para = new Paragraph(strLine + "\n", myFont);
-        para.setAlignment(Element.ALIGN_JUSTIFIED);
-        pdfDoc.add(para);
     }
 
     private Document instanciatePdf(String fileOutPdf) throws FileNotFoundException, DocumentException {
@@ -41,6 +50,20 @@ public class PDFGenerator {
         return pdfDoc;
     }
 
+    private void addParagrapheToPdf(String strLine, Font myFont, Document pdfDoc) throws DocumentException {
+        Paragraph para = new Paragraph(strLine + "\n", myFont);
+        para.setAlignment(Element.ALIGN_JUSTIFIED);
+        pdfDoc.add(para);
+    }
+
+    private void addSignature(Document document) throws IOException, DocumentException {
+        Image img = Image.getInstance("C:\\Users\\admin\\Documents\\signature.png");
+        img.setIndentationLeft(getRandomNumber(10,70));
+        img.scaleAbsolute(150,100);
+
+        document.add(img);
+    }
+
     private Font getFont() {
         return getFont(Font.NORMAL, 11);
     }
@@ -50,5 +73,9 @@ public class PDFGenerator {
         myfont.setStyle(style);
         myfont.setSize(size);
         return myfont;
+    }
+
+    private int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 }
