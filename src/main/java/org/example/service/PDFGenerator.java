@@ -18,6 +18,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 @Service
@@ -27,7 +29,7 @@ public class PDFGenerator {
         var pdfDoc = instanciatePdf(fileOutPdf);
         var myFont = getFont();
 
-        BufferedReader br = new BufferedReader(new FileReader(fileOutTxt));
+        BufferedReader br = new BufferedReader(new FileReader(fileOutTxt, StandardCharsets.UTF_8));
         addParagrapheToPdf(br.readLine(), getFont(Font.BOLD, 15), pdfDoc);
 
         String strLine;
