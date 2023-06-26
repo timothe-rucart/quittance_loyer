@@ -5,25 +5,24 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.Jpeg;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 @Service
 public class PDFGenerator {
+
+    @Value("${parameters-quittance.signatureUrl}")
+    private String signatureUrl;
 
     public void generatePdf(String fileOutTxt, String fileOutPdf) throws DocumentException, IOException {
         var pdfDoc = instanciatePdf(fileOutPdf);
@@ -43,7 +42,7 @@ public class PDFGenerator {
     }
 
     private Document instanciatePdf(String fileOutPdf) throws FileNotFoundException, DocumentException {
-        Document pdfDoc = new Document(PageSize.A4);
+        var pdfDoc = new Document(PageSize.A4);
         PdfWriter.getInstance(pdfDoc, new FileOutputStream(fileOutPdf))
                 .setPdfVersion(PdfWriter.PDF_VERSION_1_7);
         pdfDoc.open();
@@ -53,13 +52,13 @@ public class PDFGenerator {
     }
 
     private void addParagrapheToPdf(String strLine, Font myFont, Document pdfDoc) throws DocumentException {
-        Paragraph para = new Paragraph(strLine + "\n", myFont);
+        var para = new Paragraph(strLine + "\n", myFont);
         para.setAlignment(Element.ALIGN_JUSTIFIED);
         pdfDoc.add(para);
     }
 
     private void addSignature(Document document) throws IOException, DocumentException {
-        Image img = Image.getInstance("C:\\Users\\admin\\Documents\\signature.png");
+        var img = Image.getInstance(signatureUrl);
         img.setIndentationLeft(getRandomNumber(10,70));
         img.scaleAbsolute(150,100);
 
@@ -71,7 +70,7 @@ public class PDFGenerator {
     }
 
     private Font getFont(int style, int size) {
-        Font myfont = new Font();
+        var myfont = new Font();
         myfont.setStyle(style);
         myfont.setSize(size);
         return myfont;

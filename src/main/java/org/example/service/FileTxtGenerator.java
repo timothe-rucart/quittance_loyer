@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.config.ParametresQuittance;
 import org.example.utils.ConvertToWords;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,11 +24,20 @@ public class FileTxtGenerator {
     private Map<String, String> params;
     private final DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public void generateOutFile(String[] args, String file, String fileOutTxt) {
-        Path path = Paths.get(file);
-        Path pathout = Paths.get(fileOutTxt);
+    @Value("${parameters-quittance.nomLocataire}")
+    private String nomLocataire;
+    @Value("${parameters-quittance.dateDebutBail}")
+    private String dateDebutBail;
+    @Value("${parameters-quittance.chargesChiffre}")
+    private String chargesChiffre;
+    @Value("${parameters-quittance.loyerChiffre}")
+    private String loyerChiffre;
+
+    public void generateOutFile(String file, String fileOutTxt) {
+        var path = Paths.get(file);
+        var pathout = Paths.get(fileOutTxt);
         Stream<String> lines;
-        params = getParams(args);
+        params = getParams();
 
         try {
             lines = Files.lines(path, StandardCharsets.UTF_8);
@@ -48,27 +58,28 @@ public class FileTxtGenerator {
         return line;
     }
 
-    private Map<String, String> getParams(String[] args) {
-
-        LocalDate currentDate = LocalDate.now();
-        LocalDate startDateQuittance = YearMonth.now().atDay(1);
-        LocalDate endDateQuittance = YearMonth.now().atEndOfMonth();
+    private Map<String, String> getParams() {
 
         var paramMap = new HashMap<String, String>();
-        paramMap.put(ParametresQuittance.dateDebutQuittance.getValue(), startDateQuittance.format(formatterDate));
-        paramMap.put(ParametresQuittance.dateFinQuittance.getValue(), endDateQuittance.format(formatterDate));
-        paramMap.put(ParametresQuittance.dateSignature.getValue(), currentDate.format(formatterDate));
+        try {
+            var currentDate = LocalDate.now();
+            var startDateQuittance = YearMonth.now().atDay(1);
+            var endDateQuittance = YearMonth.now().atEndOfMonth();
 
-        for (int i = 1; i < args.length; i++) {
-            try {
-                String[] currentArg = args[i].split(":");
-                paramMap.put(ParametresQuittance.valueOf(currentArg[0]).getValue(), currentArg[1]);
-            } catch (Exception e) {
-                System.out.println("Erreur lors de la récupération du parametre " + args[i]);
-            }
+
+            paramMap.put(ParametresQuittance.dateDebutQuittance.getValue(), startDateQuittance.format(formatterDate));
+            paramMap.put(ParametresQuittance.dateFinQuittance.getValue(), endDateQuittance.format(formatterDate));
+            paramMap.put(ParametresQuittance.dateSignature.getValue(), currentDate.format(formatterDate));
+
+            paramMap.put(ParametresQuittance.nom.getValue(), nomLocataire);
+            paramMap.put(ParametresQuittance.dateDebutBail.getValue(), dateDebutBail);
+            paramMap.put(ParametresQuittance.chargesChiffre.getValue(), chargesChiffre);
+            paramMap.put(ParametresQuittance.loyerChiffre.getValue(), loyerChiffre);
+
+            addDetailLoyer(paramMap);
+        } catch (Exception e) {
+            System.out.println("Erreur lors de la récupération d'un paramètre d'entrée, merci de se référer au README");
         }
-
-        addDetailLoyer(paramMap);
         return paramMap;
     }
 

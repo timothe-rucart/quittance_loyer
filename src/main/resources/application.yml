@@ -1,0 +1,11 @@
+parameters-quittance:
+  signatureUrl: C:\Users\admin\Documents\signature.png
+  fileTxtPath: C:\Users\admin\Documents\quittanceTest.txt
+  nomLocataire: Mr et Mme X
+  dateDebutBail: 20/02/2020
+  chargesChiffre: 40
+  loyerChiffre: 500
+
+logging:
+  file:
+    path: C:\Users\admin\Documents\

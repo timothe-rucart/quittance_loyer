@@ -2,6 +2,7 @@ package org.example.service;
 
 import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,11 @@ import java.io.IOException;
 @Component
 public class GenerateQuittance implements CommandLineRunner {
 
+    private final String FORMAT_TXT = "txt";
+    private final String FORMAT_PDF = "pdf";
+
+    @Value("${parameters-quittance.fileTxtPath}")
+    private String FILE_TXT_PATH;
     @Autowired
     private PDFGenerator pdfGenerator;
 
@@ -17,13 +23,13 @@ public class GenerateQuittance implements CommandLineRunner {
     private FileTxtGenerator fileTxtGenerator;
 
 
-    public void generateQuittance(String[] args) throws IOException, DocumentException {
+    public void generateQuittance() throws IOException, DocumentException {
 
-        var file = args[0];
-        var fileOutTxt = getFileOut(file, "txt");
-        var fileOutPdf = getFileOut(file, "pdf");
+        var file = FILE_TXT_PATH;
+        var fileOutTxt = getFileOut(file, FORMAT_TXT);
+        var fileOutPdf = getFileOut(file, FORMAT_PDF);
 
-        fileTxtGenerator.generateOutFile(args, file, fileOutTxt);
+        fileTxtGenerator.generateOutFile(file, fileOutTxt);
 
         pdfGenerator.generatePdf(fileOutTxt, fileOutPdf);
     }
@@ -34,6 +40,6 @@ public class GenerateQuittance implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        generateQuittance(args);
+        generateQuittance();
     }
 }
