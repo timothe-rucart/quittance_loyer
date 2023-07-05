@@ -11,11 +11,15 @@ import java.io.IOException;
 @Component
 public class GenerateQuittance implements CommandLineRunner {
 
-    private final String FORMAT_TXT = "txt";
-    private final String FORMAT_PDF = "pdf";
+    private final String FORMAT_TXT = ".txt";
+    private final String FORMAT_PDF = ".pdf";
 
     @Value("${parameters-quittance.fileTxtPath}")
     private String FILE_TXT_PATH;
+
+    @Value("${parameters-quittance.nomLocataire}")
+    private String nomLocataire;
+
     @Autowired
     private PDFGenerator pdfGenerator;
 
@@ -33,8 +37,10 @@ public class GenerateQuittance implements CommandLineRunner {
         pdfGenerator.generatePdf(fileOutTxt, fileOutPdf);
     }
 
-    private static String getFileOut(String file, String format) {
-        return file.substring(0, file.length() - 4) + "Out." + format;
+    private String getFileOut(String file, String format) {
+        return file.substring(0, file.length() - 4)
+                .concat(nomLocataire.toUpperCase().replaceAll(" ", "_"))
+                .concat(format);
     }
 
     @Override

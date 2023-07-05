@@ -70,7 +70,7 @@ public class PDFGenerator {
     private void addSignature(Document document) throws IOException, DocumentException {
         var img = Image.getInstance(signatureUrl);
         img.setIndentationLeft(getRandomNumber(10, 70));
-        img.scaleAbsolute(150, 100);
+        img.scaleAbsolute(200, 150);
 
         document.add(img);
     }
