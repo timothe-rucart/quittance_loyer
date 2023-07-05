@@ -23,14 +23,13 @@ public class GenerateQuittance implements CommandLineRunner {
     private FileTxtGenerator fileTxtGenerator;
 
 
-    public void generateQuittance() throws IOException, DocumentException {
+    public void generateQuittance() {
 
         var file = FILE_TXT_PATH;
         var fileOutTxt = getFileOut(file, FORMAT_TXT);
         var fileOutPdf = getFileOut(file, FORMAT_PDF);
 
         fileTxtGenerator.generateOutFile(file, fileOutTxt);
-
         pdfGenerator.generatePdf(fileOutTxt, fileOutPdf);
     }
 

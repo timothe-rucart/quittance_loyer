@@ -1,5 +1,6 @@
 package org.example.service;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -7,7 +8,9 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,26 +22,33 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 @Service
+@Slf4j
 public class PDFGenerator {
 
     @Value("${parameters-quittance.signatureUrl}")
     private String signatureUrl;
 
-    public void generatePdf(String fileOutTxt, String fileOutPdf) throws DocumentException, IOException {
-        var pdfDoc = instanciatePdf(fileOutPdf);
-        var myFont = getFont();
+    public void generatePdf(String fileOutTxt, String fileOutPdf) {
+        try {
+            log.info("Generation du PDF");
+            var pdfDoc = instanciatePdf(fileOutPdf);
+            var myFont = getFont();
 
-        BufferedReader br = new BufferedReader(new FileReader(fileOutTxt, StandardCharsets.UTF_8));
-        addParagrapheToPdf(br.readLine(), getFont(Font.BOLD, 15), pdfDoc);
+            BufferedReader br = new BufferedReader(new FileReader(fileOutTxt, StandardCharsets.UTF_8));
+            addParagrapheToPdf(br.readLine(), getFont(Font.BOLD, 15), pdfDoc);
 
-        String strLine;
-        while ((strLine = br.readLine()) != null) {
-            addParagrapheToPdf(strLine, myFont, pdfDoc);
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                addParagrapheToPdf(strLine, myFont, pdfDoc);
+            }
+            addSignature(pdfDoc);
+
+            pdfDoc.close();
+            br.close();
+        } catch(DocumentException | IOException documentException) {
+            log.error(documentException.getMessage());
+            log.error("Erreur lors de la generation du PDF");
         }
-        addSignature(pdfDoc);
-
-        pdfDoc.close();
-        br.close();
     }
 
     private Document instanciatePdf(String fileOutPdf) throws FileNotFoundException, DocumentException {
@@ -59,8 +69,8 @@ public class PDFGenerator {
 
     private void addSignature(Document document) throws IOException, DocumentException {
         var img = Image.getInstance(signatureUrl);
-        img.setIndentationLeft(getRandomNumber(10,70));
-        img.scaleAbsolute(150,100);
+        img.setIndentationLeft(getRandomNumber(10, 70));
+        img.scaleAbsolute(150, 100);
 
         document.add(img);
     }

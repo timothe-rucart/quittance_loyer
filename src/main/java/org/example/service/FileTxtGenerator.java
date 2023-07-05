@@ -1,5 +1,6 @@
 package org.example.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.config.ParametresQuittance;
 import org.example.utils.ConvertToWords;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class FileTxtGenerator {
 
     private Map<String, String> params;
@@ -45,7 +46,8 @@ public class FileTxtGenerator {
             Files.write(pathout, replacedLines, StandardCharsets.UTF_8);
             lines.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            log.error("Erreur lors de la generation du document text");
         }
     }
 
@@ -62,6 +64,7 @@ public class FileTxtGenerator {
 
         var paramMap = new HashMap<String, String>();
         try {
+            log.info("Recuperation des paramètres pour modifier les variables du fichier TXT");
             var currentDate = LocalDate.now();
             var startDateQuittance = YearMonth.now().atDay(1);
             var endDateQuittance = YearMonth.now().atEndOfMonth();
@@ -78,7 +81,7 @@ public class FileTxtGenerator {
 
             addDetailLoyer(paramMap);
         } catch (Exception e) {
-            System.out.println("Erreur lors de la récupération d'un paramètre d'entrée, merci de se référer au README");
+            log.error("Erreur lors de la récupération d'un paramètre d'entrée, merci de se référer au README");
         }
         return paramMap;
     }
