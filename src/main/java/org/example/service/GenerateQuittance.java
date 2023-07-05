@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Component
 public class GenerateQuittance implements CommandLineRunner {
@@ -39,7 +40,8 @@ public class GenerateQuittance implements CommandLineRunner {
 
     private String getFileOut(String file, String format) {
         return file.substring(0, file.length() - 4)
-                .concat(nomLocataire.toUpperCase().replaceAll(" ", "_"))
+                .concat(nomLocataire.toUpperCase().replaceAll(" ", "_") + "_")
+                .concat(LocalDate.now().getYear() + "_" + LocalDate.now().getMonthValue())
                 .concat(format);
     }
 

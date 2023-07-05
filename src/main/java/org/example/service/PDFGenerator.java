@@ -1,6 +1,5 @@
 package org.example.service;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -8,13 +7,13 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -45,7 +44,9 @@ public class PDFGenerator {
 
             pdfDoc.close();
             br.close();
-        } catch(DocumentException | IOException documentException) {
+
+            deleteOutputFile(fileOutTxt);
+        } catch (DocumentException | IOException documentException) {
             log.error(documentException.getMessage());
             log.error("Erreur lors de la generation du PDF");
         }
@@ -89,4 +90,18 @@ public class PDFGenerator {
     private int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
+
+    private void deleteOutputFile(String fileOutputTxt) {
+        try {
+            File f = new File(fileOutputTxt);
+            if (f.delete()) {
+                log.info(f.getName() + " deleted");
+            } else {
+                log.error("fail to delete file output txt");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
+
